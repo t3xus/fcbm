@@ -54,18 +54,6 @@ fcbm [flags] "required argument" "optional argument"
 
 ---
 
-## **How It Works**
-
-1. **Dependency Check**: The script ensures Homebrew (for macOS) or other package managers are installed if necessary. It checks for essential dependencies such as `curl`, `xmlstarlet`, and `timg`, installing them if they're missing.
-
-2. **Process Management**: The script will scan running tasks and processes, terminating known unwanted processes that could be associated with malware or riskware.
-
-3. **Take Ownership**: It adds a **Take Ownership** context menu option for files and directories, making it easier to manage permissions and modify protected files.
-
-4. **Task Cleanup**: Deletes unnecessary or risky scheduled tasks to prevent future exploitation.
-
----
-
 ## **License**
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/t3xus/fcbm/blob/main/LICENSE) file for details.
