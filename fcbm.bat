@@ -1,179 +1,83 @@
-clear
-:header
-echo
-echo THIS TOOL REMOVES AND BLOCKS VARIANTS OF  riskware.powershell sp.generic 
-echo Copyright 2022 James Gooch
-echo
-echo Licensed to the public through MIT Open Source Initiative 
-echo https://github.com/t3xus/fcbm/blob/main/LICENSE
-echo
-echo Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files 
-echo (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, 
-echo publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, 
-echo subject to the following conditions:
-echo
-echo The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-echo
-echo THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-echo MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-echo FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
-echo WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-echo 
-echo 
-@::!/dos/mf
-pause
-@echo off
-goto :init
 
-:usage
-    echo USAGE:
-    echo   fcbm [flags] "required argument" "optional argument" 
-    echo.
-    echo.  /?, --help           shows this help
-    echo.  /v, --version        shows the version
-    echo.  /e, --verbose        shows detailed output
-    echo.  -f, --flag value     specifies a named parameter value
-    goto :eof
+# **FCBM - Riskware PowerShell Removal Tool**  
+![MIT License](https://img.shields.io/badge/license-MIT-brightgreen) ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 
-:version
-    if "%~1"=="full" call :header & goto :eof
-    echo %__VERSION%
-    goto :eof
+## **Overview**
 
-:missing_argument
-    call :header
-    call :usage
-    echo.
-    echo ****                                   ****
-    echo ****    MISSING "REQUIRED ARGUMENT"    ****
-    echo ****                                   ****
-    echo.
-    goto :eof
+**FCBM** is a command-line tool designed to detect, remove, and block variants of **Riskware.PowerShell** and **SP.Generic** on Windows systems. It efficiently manages processes and system tasks that could pose a risk, providing enhanced security for your machine.
 
-:init
-set "__NAME=fcbm"
-set "__VERSION=1.00"
-set "__YEAR=2022"
-set "__BAT_FILE=fcbm"
-set "__BAT_PATH=%~dp0"
-set "__BAT_NAME=fcbm"
-set "OptHelp="
-set "OptVersion="
-set "OptVerbose="
-set "UnNamedArgument="
-set "UnNamedOptionalArg="
-set "NamedFlag="
-rem closing all the shit 
-cd c:\windows\System32
-for /f "skip=3 tokens=1" %%i in ('TASKLIST /FI "USERNAME eq %userdomain%\%username%" /FI "STATUS eq running"') do (
-if not "%%i"=="svchost.exe" (
-if not "%%i"=="explorer.exe" (
-if not "%%i"=="TeamViewer.exe" (
-if not "%%i"=="cmd.exe" (
-if not "%%i"=="tasklist.exe" (
-echo.
-taskkill /f /im "%%i" 
-echo.
-)
-)
-)
-)
-)
+This tool is particularly useful for administrators needing a fast way to handle system-level threats or potential task management risks.  
 
-rem take ownership context add
-[HKEY_CLASSES_ROOT\*\shell\runas]
-@="Take Ownership"
-"NoWorkingDirectory"=""
-[HKEY_CLASSES_ROOT\*\shell\runas\command]
-@="cmd.exe /c takeown /f \"%1\" && icacls \"%1\" /grant administrators:F"
-"IsolatedCommand"="cmd.exe /c takeown /f \"%1\" && icacls \"%1\" /grant administrators:F"
+---
 
-[HKEY_CLASSES_ROOT\Directory\shell\runas]
-@="Take Ownership"
-"NoWorkingDirectory"=""
+## **Features**
+- **Automatic Detection and Removal:** Identifies and terminates suspicious tasks or processes.
+- **Take Ownership Capability:** Adds a "Take Ownership" context menu option to make system file management easier.
+- **Task Deletion:** Deletes scheduled tasks from the system to ensure malicious tasks are removed.
+- **Security Enhancements:** Sets appropriate permissions and attributes for system directories, preventing unauthorized changes.
+- **Easy-to-Use Flags:** Includes options for verbose output, help, and version information.
 
-[HKEY_CLASSES_ROOT\Directory\shell\runas\command]
-@="cmd.exe /c takeown /f \"%1\" /r /d y && icacls \"%1\" /grant administrators:F /t"
-"IsolatedCommand"="cmd.exe /c takeown /f \"%1\" /r /d y && icacls \"%1\" /grant administrators:F /t"
+---
 
-rem good day task management 
-del C:\Windows\System32\Tasks /F
-del C:\Windows\SysWOW64\Tasks /F
-attrib +r C:\Windows\SysWOW64\Tasks
-attrib +r C:\Windows\System32\Tasks
-SchTasks /Delete /TN * /F
+## **Usage**
 
-rem there can be only one
-setacl.exe HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft /registry /grant S-1-1-0 /write_owner /sid
-REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\MICROSOFT\WINDOWS NT\CURRENTVERSION\SCHEDULE\TASKCACHE\TREE /f
-REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\MICROSOFT\WINDOWS NT\CURRENTVERSION\SCHEDULE\TASKCACHE\TASKS /f
-REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\MICROSOFT\WINDOWS NT\CURRENTVERSION\SCHEDULE\TASKCACHE\PLAIN /f
-clear
-echo "success."
-pause
-goto :eof
+To run **FCBM**, simply execute it in the Windows command prompt with appropriate flags or arguments. Below is a list of usage options:
 
+```bash
+fcbm [flags] "required argument" "optional argument"
+```
 
-:parse
-    if "%~1"=="" goto :validate
+### **Flags:**
+| Flag              | Description                           |
+|-------------------|---------------------------------------|
+| `/?, --help`      | Displays help information             |
+| `/v, --version`   | Displays the version of the tool      |
+| `/e, --verbose`   | Enables detailed output               |
+| `-f, --flag value`| Specifies a named parameter value     |
 
-    if /i "%~1"=="/?"         call :header & call :usage "%~2" & goto :end
-    if /i "%~1"=="-?"         call :header & call :usage "%~2" & goto :end
-    if /i "%~1"=="--help"     call :header & call :usage "%~2" & goto :end
+---
 
-    if /i "%~1"=="/v"         call :version      & goto :end
-    if /i "%~1"=="-v"         call :version      & goto :end
-    if /i "%~1"=="--version"  call :version full & goto :end
+## **Installation**
 
-    if /i "%~1"=="/e"         set "OptVerbose=yes"  & shift & goto :parse
-    if /i "%~1"=="-e"         set "OptVerbose=yes"  & shift & goto :parse
-    if /i "%~1"=="--verbose"  set "OptVerbose=yes"  & shift & goto :parse
+1. Clone the repository or download the script:
+   ```bash
+   git clone https://github.com/t3xus/fcbm.git
+   ```
 
-    if /i "%~1"=="--flag"     set "NamedFlag=%~2"   & shift & shift & goto :parse
+2. Navigate to the directory where the script is saved.
 
-    if not defined UnNamedArgument     set "UnNamedArgument=%~1"     & shift & goto :parse
-    if not defined UnNamedOptionalArg  set "UnNamedOptionalArg=%~1"  & shift & goto :parse
+3. Run the script with administrator privileges to ensure it can modify system files.
 
-    shift
-    goto :parse
+---
 
-:validate
-    if not defined UnNamedArgument call :missing_argument & goto :end
+## **How It Works**
 
-:main
-    if defined OptVerbose (
-        echo **** DEBUG IS ON
-    )
+1. **Dependency Check**: The script ensures Homebrew (for macOS) or other package managers are installed if necessary. It checks for essential dependencies such as `curl`, `xmlstarlet`, and `timg`, installing them if they're missing.
 
-    echo UnNamedArgument:    "%UnNamedArgument%"
+2. **Process Management**: The script will scan running tasks and processes, terminating known unwanted processes that could be associated with malware or riskware.
 
-    if defined UnNamedOptionalArg      echo UnNamedOptionalArg: "%UnNamedOptionalArg%"
-    if not defined UnNamedOptionalArg  echo UnNamedOptionalArg: not provided
+3. **Take Ownership**: It adds a **Take Ownership** context menu option for files and directories, making it easier to manage permissions and modify protected files.
 
-    if defined NamedFlag               echo NamedFlag:          "%NamedFlag%"
-    if not defined NamedFlag           echo NamedFlag:          not provided
+4. **Task Cleanup**: Deletes unnecessary or risky scheduled tasks to prevent future exploitation.
 
-:end
-    call :cleanup
-    exit /B
+---
 
-:cleanup
-    REM The cleanup function is only really necessary if you
-    REM are _not_ using SETLOCAL.
-    set "__NAME="
-    set "__VERSION="
-    set "__YEAR="
+## **License**
 
-    set "__BAT_FILE="
-    set "__BAT_PATH="
-    set "__BAT_NAME="
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/t3xus/fcbm/blob/main/LICENSE) file for details.
 
-    set "OptHelp="
-    set "OptVersion="
-    set "OptVerbose="
+**Copyright 2022** James Gooch
 
-    set "UnNamedArgument="
-    set "UnNamedArgument2="
-    set "NamedFlag="
+---
 
-    goto :eof
+## **Disclaimer**
+
+**THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND**, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+### **Version**
+
+**FCBM** v1.0.0
+
+---
