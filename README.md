@@ -1,6 +1,10 @@
 
 # **FCBM - Riskware PowerShell Removal Tool**  
-![MIT License](https://img.shields.io/badge/license-MIT-brightgreen) ![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Static Badge](https://img.shields.io/badge/Author-Jgooch-1F4D37)
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+![Static Badge](https://img.shields.io/badge/Distribution-npm-orange)
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Target](https://img.shields.io/badge/Target-Microsoft%20Windows%2011%20Professional-357EC7)
 
 ## **Overview**
 
